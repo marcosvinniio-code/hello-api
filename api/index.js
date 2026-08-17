@@ -12,15 +12,19 @@ module.exports = function handler(request, response) {
     response.status(200).send("Hello, World!");
   } else if (request.url === "/health") {
     response.setHeader("Content-Type", "application/json");
-    response.status(200).send(JSON.stringify({
-      status: "ok",
-      version: packageJson.version,
-      commit: process.env.COMMIT_SHA || "local",
-      timestamp: new Date().toISOString(),
-      environment: process.env.VERCEL_ENV || "development"
-    }));
+    response.status(200).send(
+      JSON.stringify({
+        status: "ok",
+        version: packageJson.version,
+        commit: process.env.COMMIT_SHA || "local",
+        timestamp: new Date().toISOString(),
+        environment: process.env.VERCEL_ENV || "development",
+      }),
+    );
   } else {
     response.setHeader("Content-Type", "application/json");
-    response.status(404).send(JSON.stringify({ error: "not_found", path: request.url }));
+    response
+      .status(404)
+      .send(JSON.stringify({ error: "not_found", path: request.url }));
   }
 };
