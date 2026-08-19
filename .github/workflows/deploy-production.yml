@@ -1,0 +1,36 @@
+name: Deploy Production
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+      - name: Instalar Vercel CLI
+        run: npm install -g vercel@latest
+      - name: Puxar configuracao da Vercel
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Buildar projeto
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Publicar em producao
+        id: deploy
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "production_url=$url" >> "$GITHUB_OUTPUT"
+      - name: Testar health check de producao
+        run: |
+          sleep 5
+          curl -f "${{ steps.deploy.outputs.production_url }}/health"
