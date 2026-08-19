@@ -9,7 +9,7 @@ module.exports = function handler(request, response) {
 
   if (request.url === "/") {
     response.setHeader("Content-Type", "text/plain; charset=utf-8");
-    response.status(200).send("Hello, World!");
+    response.status(200).send("Olá, Mundo!");
   } else if (request.url === "/health") {
     response.setHeader("Content-Type", "application/json");
     response.status(200).send(
